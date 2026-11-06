@@ -12,8 +12,9 @@ import * as zod from './fixtures/todo.zod.routes.js'
 
 const todo = { id: '0b4e7f0e-6f3a-4c1e-9d6a-1f1e2d3c4b5a', title: 'Write it', status: 'todo' }
 
-const json = (status: number, value: unknown) =>
-  new Response(JSON.stringify(value), { status, headers: { 'Content-Type': 'application/json' } })
+function json(status: number, value: unknown) {
+  return new Response(JSON.stringify(value), { status, headers: { 'Content-Type': 'application/json' } })
+}
 
 const libraries = [
   ['zod', zod],
@@ -22,9 +23,9 @@ const libraries = [
 ] as const
 
 describe.each(libraries)('routes with %s schemas', (_, routes) => {
-  const clientOf = (answer: () => Response) => {
+  function clientOf(answer: () => Response) {
     const sent: string[] = []
-    const fetch = async (url: string) => {
+    async function fetch(url: string) {
       sent.push(url)
       return answer()
     }

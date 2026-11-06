@@ -2,12 +2,14 @@ import type { RuntimeRoute } from '../types/validation.js'
 import { isObject } from './object.js'
 import { chainOf } from './path.js'
 
-const isRoute = (value: unknown): value is RuntimeRoute =>
-  isObject(value) && typeof value['method'] === 'string' && typeof value['path'] === 'string'
+function isRoute(value: unknown): value is RuntimeRoute {
+  return isObject(value) && typeof value['method'] === 'string' && typeof value['path'] === 'string'
+}
 
 /** The routes in `routes`: one route, an array, or a module. */
-export const listRoutes = (routes: unknown): readonly RuntimeRoute[] =>
-  isRoute(routes) ? [routes] : Object.values(isObject(routes) ? routes : {}).filter(isRoute)
+export function listRoutes(routes: unknown): readonly RuntimeRoute[] {
+  return isRoute(routes) ? [routes] : Object.values(isObject(routes) ? routes : {}).filter(isRoute)
+}
 
 /** The routes by method and chain path (`get users/:id`). */
 export function indexRoutes(routes: unknown): ReadonlyMap<string, RuntimeRoute> {

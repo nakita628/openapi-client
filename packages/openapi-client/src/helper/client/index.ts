@@ -25,7 +25,7 @@ type Calls = {
 }
 
 /** A client node; child nodes are cached so re-reading a chain creates no new proxies. */
-const proxy = (calls: Calls, aliases: ReadonlyMap<string, Alias>, path: readonly string[] = []): unknown => {
+function proxy(calls: Calls, aliases: ReadonlyMap<string, Alias>, path: readonly string[] = []): unknown {
   const children = new Map<string, unknown>()
   let leaf: Leaf | undefined
   return new Proxy(() => {}, {
@@ -77,7 +77,7 @@ export function oc(...args: readonly unknown[]): unknown {
     }
     return call(`${base}${path}${search}`, path, method, request, merged, route).then(({ response }) => response)
   }
-  const leaf = (chain: readonly string[]): Leaf => {
+  function leaf(chain: readonly string[]): Leaf {
     const method = chain.at(-1)?.match(/^\$(.+)$/)?.[1]
     const segments = chain.slice(0, -1)
     const fixed = segments.some((segment) => segment.startsWith(':')) ? undefined : `/${pathOf(segments, undefined)}`

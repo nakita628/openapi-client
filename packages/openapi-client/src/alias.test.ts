@@ -6,8 +6,9 @@ import * as routes from './fixtures.js'
 import { server } from './fixtures.js'
 import { createRoute, DetailedError, oc } from './index.js'
 
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+}
 
 describe('aliasOf: as zodcall names an alias', () => {
   it('joins the words of an operationId', () => {
@@ -193,11 +194,12 @@ describe('what an alias throws', () => {
     },
   })
   const accounts = { conflictRoute }
-  const caught = (promise: Promise<unknown>) =>
-    promise.then(
+  function caught(promise: Promise<unknown>) {
+    return promise.then(
       () => undefined,
       (error: unknown) => error,
     )
+  }
 
   it('fills a missing status text from the status', async () => {
     const client = oc(accounts, 'http://x', { fetch: () => json({ message: 'taken' }, 409) })

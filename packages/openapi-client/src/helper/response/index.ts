@@ -52,7 +52,7 @@ export async function parseResponse<T extends ClientResponse<any, any, any>>(
 }
 
 /** The `DetailedError` of a non-`ok` response. */
-export const failure = (res: Response | ClientResponse<unknown>, data: unknown, alias?: string): DetailedError => {
+export function failure(res: Response | ClientResponse<unknown>, data: unknown, alias?: string): DetailedError {
   const statusText = res.statusText || REASONS[res.status] || ''
   return new DetailedError(statusText ? `${res.status} ${statusText}` : String(res.status), {
     statusCode: res.status,
@@ -62,7 +62,7 @@ export const failure = (res: Response | ClientResponse<unknown>, data: unknown, 
 }
 
 /** The `DetailedError` of a request that got no response. */
-export const unanswered = (error: unknown, alias: string): DetailedError => {
+export function unanswered(error: unknown, alias: string): DetailedError {
   const name = error instanceof Error ? error.name : undefined
   const code = name === 'TimeoutError' ? 'TIMEOUT' : name === 'AbortError' ? 'ABORTED' : 'NETWORK'
   const message = error instanceof Error ? error.message : String(error)

@@ -11,13 +11,14 @@ import type { Client } from './fixtures/todo.routes.js'
 
 const todo = { id: '1', title: 'Write it', status: 'todo' }
 
-const json = (status: number, value: unknown) =>
-  new Response(JSON.stringify(value), { status, headers: { 'Content-Type': 'application/json' } })
+function json(status: number, value: unknown) {
+  return new Response(JSON.stringify(value), { status, headers: { 'Content-Type': 'application/json' } })
+}
 
 /** The Todo API, as far as the tests ask it; each request recorded. */
-const api = () => {
+function api() {
   const sent: { url: string; init: RequestInit }[] = []
-  const fetch = async (url: string, init: RequestInit) => {
+  async function fetch(url: string, init: RequestInit) {
     sent.push({ url, init })
     const { pathname } = new URL(url)
     if (init.method === 'GET' && pathname === '/todos') return json(200, [todo])

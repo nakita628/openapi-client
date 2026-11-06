@@ -8,17 +8,18 @@ import { createRoute, DetailedError, oc, parseResponse, schema } from './index.j
 import type { RouteSchema } from './index.js'
 
 /** A fetch that records what it was asked, and answers `respond()`. */
-const stub = (respond: () => Response) => {
+function stub(respond: () => Response) {
   const calls: { input: string; init: RequestInit }[] = []
-  const fetch = (input: string, init: RequestInit) => {
+  function fetch(input: string, init: RequestInit) {
     calls.push({ input, init })
     return respond()
   }
   return { calls, fetch }
 }
 
-const json = (body: unknown, status = 200, type = 'application/json') =>
-  new Response(JSON.stringify(body), { status, headers: { 'Content-Type': type } })
+function json(body: unknown, status = 200, type = 'application/json') {
+  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': type } })
+}
 
 describe('oc(routes, url): the request', () => {
   const client = oc(routes, 'http://localhost', { fetch: server })
@@ -165,13 +166,16 @@ describe('oc<typeof routes>(url)', () => {
 })
 
 describe('oc(routes, url): the response headers', () => {
-  const routeWith = (headers: RouteSchema | Record<string, unknown>) =>
-    createRoute({
+  function routeWith(headers: RouteSchema | Record<string, unknown>) {
+    return createRoute({
       method: 'get',
       path: '/h',
       responses: { 200: { description: 'ok', headers } },
     })
-  const answer = (headers: Record<string, string>) => () => new Response(null, { status: 200, headers })
+  }
+  function answer(headers: Record<string, string>) {
+    return () => new Response(null, { status: 200, headers })
+  }
 
   it('checks an object schema, reading the names case-insensitively', async () => {
     const route = routeWith(z.object({ 'X-Rate-Limit': z.string().regex(/^\d+$/) }))
@@ -202,12 +206,14 @@ describe('oc(routes, url): the response headers', () => {
 
 describe('oc(routes, url): the checked response, its body read again', () => {
   const user = { id: '1', name: 'Ultra-man' }
-  const answered = () => {
+  function answered() {
     const res = json(user)
     Object.defineProperty(res, 'url', { value: 'http://localhost/users/1' })
     return res
   }
-  const get = () => oc(routes, 'http://localhost', { fetch: answered }).users[':id'].$get({ param: { id: '1' } })
+  function get() {
+    return oc(routes, 'http://localhost', { fetch: answered }).users[':id'].$get({ param: { id: '1' } })
+  }
 
   it('is the response fetch answered: a Response, its url kept', async () => {
     const res = await get()

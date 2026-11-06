@@ -18,9 +18,11 @@ type State = {
 
 type Replayed = Response & { [STATE]: State }
 
-const consumed = () => Promise.reject(new TypeError('Body has already been consumed.'))
+function consumed() {
+  return Promise.reject(new TypeError('Body has already been consumed.'))
+}
 
-const copyOf = (response: Replayed): Response => {
+function copyOf(response: Replayed): Response {
   const state = response[STATE]
   state.copy ??= new Response(state.text, {
     status: response.status,
@@ -31,10 +33,11 @@ const copyOf = (response: Replayed): Response => {
 }
 
 /** A reader delegated to the copy; rejects once `json()` has been read. */
-const delegate = <K extends 'text' | 'blob' | 'arrayBuffer' | 'bytes' | 'formData'>(name: K) =>
-  function (this: Replayed) {
+function delegate<K extends 'text' | 'blob' | 'arrayBuffer' | 'bytes' | 'formData'>(name: K) {
+  return function (this: Replayed) {
     return this[STATE].read ? consumed() : copyOf(this)[name]()
   }
+}
 
 const REPLAY: object = Object.create(Response.prototype, {
   json: {
@@ -93,5 +96,6 @@ export function replay(response: Response, text: string, parsed?: { readonly val
 }
 
 /** Whether a response has a body, without forcing a replayed response's copy. */
-export const hasBody = (response: Response | { readonly body: unknown }): boolean =>
-  STATE in response ? (response as Replayed)[STATE].text !== '' : response.body !== null
+export function hasBody(response: Response | { readonly body: unknown }): boolean {
+  return STATE in response ? (response as Replayed)[STATE].text !== '' : response.body !== null
+}

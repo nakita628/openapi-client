@@ -122,13 +122,16 @@ export function serve(
 }
 
 /** A JSON response. */
-export const json = (body: unknown, status = 200) => Response.json(body, { status })
+export function json(body: unknown, status = 200) {
+  return Response.json(body, { status })
+}
 
-const cookieOf = (request: Request, name: string) =>
-  (request.headers.get('cookie') ?? '')
+function cookieOf(request: Request, name: string) {
+  return (request.headers.get('cookie') ?? '')
     .split('; ')
     .map((pair) => pair.split('='))
     .find(([key]) => key === name)?.[1]
+}
 
 /** The routes above, served. */
 export const server = serve({

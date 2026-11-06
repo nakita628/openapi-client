@@ -17,11 +17,12 @@ const searchRoute = createRoute({
 })
 const routes = { searchRoute }
 
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+}
 
 /** A client whose `fetch` answers `body`, recording each request's method and body. */
-const clientOf = (body: unknown) => {
+function clientOf(body: unknown) {
   const sent: { method: string | undefined; body: unknown }[] = []
   const client = oc(routes, 'http://x', {
     fetch: (_url, init) => {

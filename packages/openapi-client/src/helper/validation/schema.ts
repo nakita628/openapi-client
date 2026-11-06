@@ -1,7 +1,9 @@
 import { isObject } from '../../utils/object.js'
 
 /** Whether a value is a Standard Schema (callable ones included). */
-export const isStandard = (value: unknown): boolean => isObject(value) && '~standard' in value
+export function isStandard(value: unknown): boolean {
+  return isObject(value) && '~standard' in value
+}
 
 export type StandardIssue = {
   readonly message: string

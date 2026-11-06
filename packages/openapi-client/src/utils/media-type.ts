@@ -5,10 +5,12 @@ export const JSON_TYPE = /^application\/(?:[\w!#$%&*.^`~-]*\+)?json$/i
 export const FORM_TYPE = /^(?:multipart\/form-data|application\/x-www-form-urlencoded)$/i
 
 /** The media type of a `Content-Type` header, without its parameters (`; charset=utf-8`). */
-export const mediaTypeOf = (headers: Headers): string | undefined => headers.get('content-type')?.split(';')[0]?.trim()
+export function mediaTypeOf(headers: Headers): string | undefined {
+  return headers.get('content-type')?.split(';')[0]?.trim()
+}
 
 /** Whether a response says its body is JSON. */
-export const isJson = (response: { readonly headers: Headers }): boolean => {
+export function isJson(response: { readonly headers: Headers }): boolean {
   const type = mediaTypeOf(response.headers)
   return type !== undefined && JSON_TYPE.test(type)
 }

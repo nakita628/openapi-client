@@ -6,10 +6,13 @@
 /** A JSON object. */
 export type Json = { readonly [key: string]: unknown }
 
-export const isJson = (value: unknown): value is Json =>
-  typeof value === 'object' && value !== null && !Array.isArray(value)
+export function isJson(value: unknown): value is Json {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
 
-const listOf = (value: unknown): readonly unknown[] => (Array.isArray(value) ? value : [])
+function listOf(value: unknown): readonly unknown[] {
+  return Array.isArray(value) ? value : []
+}
 
 /** What `toType` needs beside the schema. */
 export type TypeContext = {
@@ -40,10 +43,14 @@ export function schemaKeyOf(ref: string): string | undefined {
 }
 
 /** A property key as TypeScript writes it: bare when it is an identifier, quoted otherwise. */
-export const keyOf = (key: string) => (/^[A-Za-z_$][\w$]*$/u.test(key) ? key : JSON.stringify(key))
+export function keyOf(key: string) {
+  return /^[A-Za-z_$][\w$]*$/u.test(key) ? key : JSON.stringify(key)
+}
 
 /** A union or intersection member, or an array item: parenthesized when it is itself a union or intersection. */
-const operand = (type: string) => (hasTopLevelOperator(type) ? `(${type})` : type)
+function operand(type: string) {
+  return hasTopLevelOperator(type) ? `(${type})` : type
+}
 
 /** A `|` or `&` outside any bracket and any string literal. */
 function hasTopLevelOperator(type: string): boolean {
@@ -64,7 +71,7 @@ function hasTopLevelOperator(type: string): boolean {
 }
 
 /** The union of types, written once each; `unknown` absorbs, `never` drops. */
-export const union = (types: readonly string[]) => {
+export function union(types: readonly string[]) {
   const unique = [...new Set(types)]
   if (unique.includes('unknown')) return 'unknown'
   const members = unique.filter((type) => type !== 'never')
@@ -72,21 +79,24 @@ export const union = (types: readonly string[]) => {
   return members.map(operand).join(' | ')
 }
 
-const intersection = (types: readonly string[]) => {
+function intersection(types: readonly string[]) {
   const members = [...new Set(types)].filter((type) => type !== 'unknown')
   if (members.includes('never')) return 'never'
   if (members.length <= 1) return members[0] ?? 'unknown'
   return members.map(operand).join(' & ')
 }
 
-const literalOf = (value: unknown): string =>
-  value === null || typeof value !== 'object' ? JSON.stringify(value) : 'unknown'
+function literalOf(value: unknown): string {
+  return value === null || typeof value !== 'object' ? JSON.stringify(value) : 'unknown'
+}
 
 const TYPES = ['string', 'number', 'integer', 'boolean', 'null', 'array', 'object'] as const
 
 type SimpleType = (typeof TYPES)[number]
 
-const isSimpleType = (value: unknown): value is SimpleType => TYPES.some((type) => type === value)
+function isSimpleType(value: unknown): value is SimpleType {
+  return TYPES.some((type) => type === value)
+}
 
 /** The types a schema declares, or the ones its keywords imply (`properties` an object, ...). */
 function typesOf(schema: Json): SimpleType[] {
@@ -181,7 +191,9 @@ export function toType(schema: unknown, context: TypeContext, seen: ReadonlySet<
   }
 
   const nullable = schema['nullable'] === true
-  const withNull = (type: string) => (nullable ? union([type, 'null']) : type)
+  function withNull(type: string) {
+    return nullable ? union([type, 'null']) : type
+  }
 
   if (schema['const'] !== undefined) return withNull(literalOf(schema['const']))
   if (Array.isArray(schema['enum'])) return withNull(union(schema['enum'].map(literalOf)))

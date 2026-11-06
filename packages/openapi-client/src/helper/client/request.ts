@@ -7,7 +7,7 @@ import { buildSearchParams, formOf, present, text } from '../../utils/value.js'
 import { checkRequest, checkResponse, problem } from '../validation/index.js'
 
 /** The query string of a call, `?` included; empty without a query. */
-export const searchOf = (args: Args | undefined, options: ClientRequestOptions): string => {
+export function searchOf(args: Args | undefined, options: ClientRequestOptions): string {
   if (!args?.query) return ''
   const search = (options.buildSearchParams ?? buildSearchParams)(args.query).toString()
   return search ? `?${search}` : ''
@@ -18,7 +18,7 @@ const NO_FORMAT: ReturnType<typeof bodyFormatOf> = {}
 const formats = new WeakMap<RuntimeRoute, ReturnType<typeof bodyFormatOf>>()
 
 /** A route's body format, worked out once per route. */
-const formatOf = (route: RuntimeRoute): ReturnType<typeof bodyFormatOf> => {
+function formatOf(route: RuntimeRoute): ReturnType<typeof bodyFormatOf> {
   let format = formats.get(route)
   if (format === undefined) formats.set(route, (format = bodyFormatOf(route)))
   return format
@@ -97,18 +97,19 @@ export async function call(
 
 type HeadersOption = ClientRequestOptions['headers']
 
-const resolve = async (headers: HeadersOption): Promise<HeadersInit | undefined> =>
-  typeof headers === 'function' ? headers() : headers
+async function resolve(headers: HeadersOption): Promise<HeadersInit | undefined> {
+  return typeof headers === 'function' ? headers() : headers
+}
 
 /** Headers, `over`'s replacing `base`'s of the same name. */
-const combine = (base: HeadersInit | undefined, over: HeadersInit | undefined): Headers => {
+function combine(base: HeadersInit | undefined, over: HeadersInit | undefined): Headers {
   const headers = new Headers(base)
   for (const [key, value] of new Headers(over)) headers.set(key, value)
   return headers
 }
 
 /** Merges two `headers` options; if either is a function the result is one, called per request. */
-const mergeHeaders = (base: HeadersOption, over: HeadersOption): HeadersOption => {
+function mergeHeaders(base: HeadersOption, over: HeadersOption): HeadersOption {
   if (base === undefined) return over
   if (over === undefined) return base
   if (typeof base === 'function' || typeof over === 'function') {
@@ -118,7 +119,7 @@ const mergeHeaders = (base: HeadersOption, over: HeadersOption): HeadersOption =
 }
 
 /** A call's options over the client's: `headers` merged, the others replaced. */
-export const merge = (base: ClientRequestOptions, over: ClientRequestOptions | undefined): ClientRequestOptions => {
+export function merge(base: ClientRequestOptions, over: ClientRequestOptions | undefined): ClientRequestOptions {
   if (!over) return base
   return { ...base, ...over, headers: mergeHeaders(base.headers, over.headers) }
 }

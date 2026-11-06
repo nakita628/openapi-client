@@ -76,12 +76,15 @@ describe('generate', () => {
   })
 })
 
-const json = (ref: string) => ({ description: 'ok', content: { 'application/json': { schema: { $ref: ref } } } })
+function json(ref: string) {
+  return { description: 'ok', content: { 'application/json': { schema: { $ref: ref } } } }
+}
 
 describe('generateRoutes', () => {
   const ok = { responses: { 200: { description: 'ok' } } }
-  const namesOf = (paths: Record<string, unknown>) =>
-    [...generateRoutes({ paths }).matchAll(/^(\w+): \{\nmethod: /gmu)].map((match) => match[1])
+  function namesOf(paths: Record<string, unknown>) {
+    return [...generateRoutes({ paths }).matchAll(/^(\w+): \{\nmethod: /gmu)].map((match) => match[1])
+  }
 
   it('names a route by its method and path, as hono-takibi does, its operationId aside', () => {
     expect(

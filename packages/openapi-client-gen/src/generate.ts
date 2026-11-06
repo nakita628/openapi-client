@@ -23,8 +23,9 @@ export type GenerateOptions = {
 }
 
 /** Whether the client is given the routes: for its aliases, and always with a schema library (to check calls). */
-const givesRoutes = (options: Pick<GenerateOptions, 'client' | 'schema'>) =>
-  options.client?.aliases !== false || options.schema !== undefined
+function givesRoutes(options: Pick<GenerateOptions, 'client' | 'schema'>) {
+  return options.client?.aliases !== false || options.schema !== undefined
+}
 
 /** The schema libraries a route may be declared with: Standard Schemas, written by oas-truth. */
 export const SCHEMA_LIBRARIES = ['zod', 'valibot', 'arktype'] as const
@@ -41,7 +42,9 @@ type Location = 'path' | 'query' | 'header' | 'cookie'
 
 const LOCATIONS: readonly Location[] = ['path', 'query', 'header', 'cookie']
 
-const isLocation = (value: unknown): value is Location => LOCATIONS.some((location) => location === value)
+function isLocation(value: unknown): value is Location {
+  return LOCATIONS.some((location) => location === value)
+}
 
 /** The part of `request` each location is declared in. */
 const PART: Readonly<Record<Location, string>> = {
@@ -93,7 +96,9 @@ const RESERVED = new Set([
   'UrlEndpoint',
 ])
 
-const listOf = (value: unknown): readonly unknown[] => (Array.isArray(value) ? value : [])
+function listOf(value: unknown): readonly unknown[] {
+  return Array.isArray(value) ? value : []
+}
 
 /** What a local `$ref` (`#/components/parameters/Limit`) points to. */
 function pointerOf(document: Json, ref: string): unknown {
@@ -132,7 +137,9 @@ const SYMBOL_WORDS: Readonly<Record<string, string>> = {
   '%': 'Percent',
 }
 
-const symbolWord = (char: string) => SYMBOL_WORDS[char] ?? `U${(char.codePointAt(0) ?? 0).toString(16).toUpperCase()}`
+function symbolWord(char: string) {
+  return SYMBOL_WORDS[char] ?? `U${(char.codePointAt(0) ?? 0).toString(16).toUpperCase()}`
+}
 
 /**
  * A route's name by method and path, as hono-takibi names it (`GET /users/{id}` is `getUsersId`).
@@ -181,20 +188,26 @@ function claim(name: string, taken: Set<string>): string {
 }
 
 /** Each entry on its own line, so that the formatter keeps the object open field by field. */
-const block = (entries: readonly string[]) => (entries.length === 0 ? '{}' : `{\n${entries.join(',\n')},\n}`)
+function block(entries: readonly string[]) {
+  return entries.length === 0 ? '{}' : `{\n${entries.join(',\n')},\n}`
+}
 
-const literal = (value: unknown): string =>
-  isJson(value)
+function literal(value: unknown): string {
+  return isJson(value)
     ? block(Object.entries(value).map(([key, item]) => `${keyOf(key)}: ${literal(item)}`))
     : Array.isArray(value)
       ? `[${value.map(literal).join(', ')}]`
       : JSON.stringify(value)
+}
 
 /** A JSON Schema, as oas-truth takes one. */
-const isSchema = (value: unknown): value is Schema => isJson(value)
+function isSchema(value: unknown): value is Schema {
+  return isJson(value)
+}
 
-const isSchemas = (value: unknown): value is { readonly [key: string]: Schema } =>
-  isJson(value) && Object.values(value).every(isSchema)
+function isSchemas(value: unknown): value is { readonly [key: string]: Schema } {
+  return isJson(value) && Object.values(value).every(isSchema)
+}
 
 /** How a schema slot is written: `schema<T>()`, or the schema library's. */
 type Slots = {
@@ -254,7 +267,9 @@ type Operation = {
   readonly alias: string
 }
 
-const mentions = (code: string, name: string) => new RegExp(`\\b${name}\\b`, 'u').test(code)
+function mentions(code: string, name: string) {
+  return new RegExp(`\\b${name}\\b`, 'u').test(code)
+}
 
 /** The types the code names, and those they name in turn. */
 function reachable(declarations: ReadonlyMap<string, string>, code: string): Set<string> {
@@ -291,7 +306,9 @@ export function generateRoutes(document: Json, options: Pick<GenerateOptions, 'c
     // A schema library checks a form's file as a `File`, so the type says `File` too.
     ...(options.schema === undefined ? {} : { binary: 'File' }),
   }
-  const typeOf = (schema: unknown, form = false) => toType(schema, form ? { ...context, form } : context)
+  function typeOf(schema: unknown, form = false) {
+    return toType(schema, form ? { ...context, form } : context)
+  }
 
   const declarations = new Map([...names].map(([key, name]) => [name, `type ${name} = ${typeOf(schemas[key])}`]))
 
@@ -326,14 +343,15 @@ export function generateRoutes(document: Json, options: Pick<GenerateOptions, 'c
     declarations.set(varName, code.replaceAll(/^export const /gmu, 'const '))
   }
 
-  const content = (media: unknown, isRequest: boolean) =>
-    Object.entries(isJson(media) ? media : {}).map(([mediaType, value]) => {
+  function content(media: unknown, isRequest: boolean) {
+    return Object.entries(isJson(media) ? media : {}).map(([mediaType, value]) => {
       const entry = deref(document, value)
       const schema = isJson(entry) ? entry['schema'] : undefined
       return `${JSON.stringify(mediaType)}: ${
         schema === undefined ? '{}' : `{ schema: ${slots.of(schema, isRequest && FORM.test(mediaType))} }`
       }`
     })
+  }
 
   const routes: string[] = []
   const operations: Operation[] = []
@@ -556,11 +574,12 @@ function responseTypesOf(document: Json, operation: Json, typeOf: RouteParts['ty
 }
 
 /** A call's responses, one `ClientResponse` per declared status, as openapi-client types them. */
-const clientResponsesOf = (responses: readonly ResponseType[]): string[] =>
-  responses.map(({ key, body, format }) => {
+function clientResponsesOf(responses: readonly ResponseType[]): string[] {
+  return responses.map(({ key, body, format }) => {
     const status = /^\d+$/u.test(key) ? String(Number(key)) : (STATUS[key] ?? 'number')
     return `ClientResponse<${body}, ${status}, '${format}'>`
   })
+}
 
 /** The `responses` keys an alias answers the body of: the 1XX-3XX statuses openapi-client knows, and their ranges. */
 const SUCCESS_KEYS = new Set([
@@ -658,7 +677,7 @@ function aliasSignatureOf(
 }
 
 /** An operationId's alias name, as openapi-client's `aliasOf` makes it (`list-pets` is `listPets`). */
-const aliasOf = (operationId: string): string => {
+function aliasOf(operationId: string): string {
   const words = operationId.split(/[ !"#%&'()*+,\-./:;<=>?@[\\\]^`{|}~]+/u).filter((word) => word !== '')
   const joined = words
     .map((word, index) => (index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)))
@@ -667,17 +686,22 @@ const aliasOf = (operationId: string): string => {
 }
 
 /** The chain keys of a path: `/users/{id}` is `users`, `:id`; `/` is `index`. */
-const chainOf = (path: string): string[] =>
-  path
+function chainOf(path: string): string[] {
+  return path
     .replace(/^\//u, '')
     .split('/')
     .map((segment) => (segment === '' ? 'index' : segment.replace(/^\{(.+)\}$/u, ':$1')))
+}
 
 type TreeNode = { readonly children: Map<string, TreeNode>; readonly operations: Operation[] }
 
-const treeNode = (): TreeNode => ({ children: new Map(), operations: [] })
+function treeNode(): TreeNode {
+  return { children: new Map(), operations: [] }
+}
 
-const routeType = (operation: Operation) => `typeof routes.${operation.name}`
+function routeType(operation: Operation) {
+  return `typeof routes.${operation.name}`
+}
 
 /** What a validating client answers itself: 422 for a request it did not send, 502 for a response that does not match. */
 const PROBLEMS = [

@@ -31,7 +31,7 @@ function issuesOf(result: StandardResult, where: ValidationLocation): Validation
   }))
 }
 
-const settle = (result: StandardResult, value: unknown, where: ValidationLocation) => {
+function settle(result: StandardResult, value: unknown, where: ValidationLocation) {
   const issues = issuesOf(result, where)
   return { issues, value: issues.length > 0 ? value : result.value }
 }
@@ -44,7 +44,7 @@ function validate(schema: unknown, value: unknown, where: ValidationLocation): M
   return result instanceof Promise ? result.then((r) => settle(r, value, where)) : settle(result, value, where)
 }
 
-const schemaFor = (content: RuntimeContent | undefined, mediaType: RegExp): unknown => {
+function schemaFor(content: RuntimeContent | undefined, mediaType: RegExp): unknown {
   if (content === undefined) return undefined
   if ('application/json' in content && mediaType === JSON_TYPE) return content['application/json']?.schema
   for (const type in content) if (mediaType.test(type)) return content[type]?.schema

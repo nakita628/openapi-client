@@ -42,8 +42,9 @@ describe('Valibot routes', () => {
       Response.json({ id: '1', ...((await request.json()) as object) }, { status: 201 }),
   })
 
-  const json = (body: unknown, status = 200) =>
-    new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+  function json(body: unknown, status = 200) {
+    return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+  }
 
   const client = oc(routes, 'http://localhost', { fetch: server })
 
@@ -115,8 +116,9 @@ describe('ArkType routes', () => {
       Response.json({ id: '1', ...((await request.json()) as object) }, { status: 201 }),
   })
 
-  const json = (body: unknown, status = 200) =>
-    new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+  function json(body: unknown, status = 200) {
+    return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+  }
 
   const client = oc(routes, 'http://localhost', { fetch: server })
 
@@ -196,8 +198,9 @@ describe('Effect Schema routes', () => {
       Response.json({ id: '1', ...((await request.json()) as object) }, { status: 201 }),
   })
 
-  const json = (body: unknown, status = 200) =>
-    new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+  function json(body: unknown, status = 200) {
+    return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+  }
 
   const client = oc(routes, 'http://localhost', { fetch: server })
 

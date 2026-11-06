@@ -25,9 +25,9 @@ const getItemRoute = createRoute({
 const routes = { getItemRoute }
 
 /** A server answering what a test says, recording what it was sent. */
-const server = (body: unknown) => {
+function server(body: unknown) {
   const sent: string[] = []
-  const fetch = async (input: string) => {
+  async function fetch(input: string) {
     sent.push(input)
     return Response.json(body)
   }

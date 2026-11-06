@@ -1,11 +1,15 @@
 /** Whether a value is sent: `undefined` and `null` are left out. */
-export const present = (value: unknown): boolean => value !== undefined && value !== null
+export function present(value: unknown): boolean {
+  return value !== undefined && value !== null
+}
 
 /** A value as text: a `Date` as ISO 8601. */
-export const text = (value: unknown): string => (value instanceof Date ? value.toISOString() : String(value))
+export function text(value: unknown): string {
+  return value instanceof Date ? value.toISOString() : String(value)
+}
 
 /** The default query builder: repeats the key for arrays, skips `undefined` and `null`. */
-export const buildSearchParams = (query: Readonly<Record<string, unknown>>): URLSearchParams => {
+export function buildSearchParams(query: Readonly<Record<string, unknown>>): URLSearchParams {
   const params = new URLSearchParams()
   for (const [key, value] of Object.entries(query)) {
     for (const item of Array.isArray(value) ? value : [value]) if (present(item)) params.append(key, text(item))
@@ -14,7 +18,7 @@ export const buildSearchParams = (query: Readonly<Record<string, unknown>>): URL
 }
 
 /** A form as `FormData` (multipart, the default), or `URLSearchParams` (urlencoded). */
-export const formOf = (form: Readonly<Record<string, unknown>>, encoding: 'multipart' | 'urlencoded'): BodyInit => {
+export function formOf(form: Readonly<Record<string, unknown>>, encoding: 'multipart' | 'urlencoded'): BodyInit {
   const data = encoding === 'urlencoded' ? new URLSearchParams() : new FormData()
   for (const [key, value] of Object.entries(form)) {
     for (const item of Array.isArray(value) ? value : [value]) {
