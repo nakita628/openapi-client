@@ -1,0 +1,52 @@
+{
+  "name": "openapi-client-gen",
+  "version": "0.0.1",
+  "description": "Generate openapi-client routes typed with TypeScript alone (createRoute, schema<T>()), no schema library, from an OpenAPI or TypeSpec document",
+  "keywords": [
+    "client",
+    "codegen",
+    "hono",
+    "openapi",
+    "typescript",
+    "typespec"
+  ],
+  "license": "MIT",
+  "bin": {
+    "openapi-client-gen": "dist/bin.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "vp pack"
+  },
+  "dependencies": {
+    "@apidevtools/swagger-parser": "^13.1.0",
+    "@typespec/compiler": "^1.17.0",
+    "@typespec/openapi3": "^1.17.0",
+    "oas-truth": "0.6.1",
+    "oxfmt": "^0.75.0"
+  },
+  "devDependencies": {
+    "arktype": "^2.2.9",
+    "openapi-client": "workspace:*",
+    "valibot": "^1.5.0",
+    "zod": "^4.6.7"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

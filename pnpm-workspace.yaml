@@ -1,0 +1,8 @@
+packages:
+  - packages/*
+
+# Vite+ (vite-plus): one Vite and one Vitest for the whole workspace, the versions `vp` ships with
+# (`vp toolchain vitest`). Bump them along with vite-plus.
+overrides:
+  vite@*: npm:@voidzero-dev/vite-plus-core@1.4.0
+  vitest@*: 5.0.5

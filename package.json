@@ -1,0 +1,17 @@
+{
+  "name": "openapi-client-workspace",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "vp check",
+    "check:fix": "vp check --fix",
+    "test": "vp test run",
+    "build": "vp run -r build"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "typescript": "7.0.2",
+    "vite-plus": "1.4.0"
+  },
+  "packageManager": "pnpm@11.7.0"
+}
