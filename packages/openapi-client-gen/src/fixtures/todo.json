@@ -1,0 +1,161 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "Todo", "version": "1.0.0" },
+  "paths": {
+    "/todos": {
+      "get": {
+        "operationId": "listTodos",
+        "tags": ["todos"],
+        "summary": "List the todos",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "At most this many",
+            "schema": { "type": "integer", "minimum": 1 }
+          },
+          { "name": "status", "in": "query", "schema": { "$ref": "#/components/schemas/Status" } },
+          { "name": "X-Request-Id", "in": "header", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "The todos",
+            "content": {
+              "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Todo" } } }
+            }
+          },
+          "default": { "$ref": "#/components/responses/Problem" }
+        }
+      },
+      "post": {
+        "operationId": "create-todo",
+        "tags": ["todos"],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NewTodo" } } }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Todo" } } }
+          },
+          "4XX": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/todos/{id}": {
+      "parameters": [{ "$ref": "#/components/parameters/TodoId" }],
+      "get": {
+        "operationId": "getTodo",
+        "tags": ["todos"],
+        "responses": {
+          "200": {
+            "description": "The todo",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Todo" } } }
+          },
+          "404": { "$ref": "#/components/responses/Problem" }
+        }
+      },
+      "delete": {
+        "tags": ["todos"],
+        "deprecated": true,
+        "responses": { "204": { "description": "Deleted" } }
+      }
+    },
+    "/files": {
+      "post": {
+        "operationId": "uploadFile",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": { "file": { "type": "string", "format": "binary" }, "name": { "type": "string" } },
+                "required": ["file"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Stored", "content": { "text/plain": { "schema": { "type": "string" } } } }
+        }
+      }
+    },
+    "/tree": {
+      "get": {
+        "operationId": "getTree",
+        "parameters": [{ "name": "session", "in": "cookie", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "The tree",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Tree" } } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Status": { "type": "string", "enum": ["todo", "doing", "done"] },
+      "Todo": {
+        "type": "object",
+        "description": "A thing to do",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string", "minLength": 1 },
+          "status": { "$ref": "#/components/schemas/Status" },
+          "due": { "type": ["string", "null"], "format": "date-time" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "meta": { "type": "object", "additionalProperties": { "type": "number" } },
+          "assignee": { "oneOf": [{ "$ref": "#/components/schemas/User" }, { "$ref": "#/components/schemas/Team" }] }
+        },
+        "required": ["id", "title", "status"]
+      },
+      "NewTodo": {
+        "allOf": [
+          { "type": "object", "properties": { "title": { "type": "string" } }, "required": ["title"] },
+          { "type": "object", "properties": { "status": { "$ref": "#/components/schemas/Status" } } }
+        ]
+      },
+      "User": {
+        "type": "object",
+        "properties": { "kind": { "const": "user" }, "name": { "type": "string" } },
+        "required": ["kind", "name"]
+      },
+      "Team": {
+        "type": "object",
+        "properties": {
+          "kind": { "const": "team" },
+          "members": { "type": "array", "items": { "$ref": "#/components/schemas/User" } }
+        },
+        "required": ["kind", "members"]
+      },
+      "Tree": {
+        "type": "object",
+        "properties": {
+          "value": { "type": "number" },
+          "children": { "type": "array", "items": { "$ref": "#/components/schemas/Tree" } }
+        },
+        "required": ["value", "children"]
+      },
+      "Problem": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "status": { "type": "integer" },
+          "detail": { "type": "string" }
+        },
+        "required": ["title", "status"]
+      }
+    },
+    "parameters": {
+      "TodoId": { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+    },
+    "responses": {
+      "Problem": {
+        "description": "A problem",
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } }
+      }
+    }
+  }
+}

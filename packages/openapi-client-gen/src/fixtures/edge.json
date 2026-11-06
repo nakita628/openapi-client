@@ -1,0 +1,233 @@
+{
+  "openapi": "3.2.0",
+  "info": {
+    "title": "Edge cases of the client's type",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "getIndex",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "text/html": {}
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "head": {
+        "operationId": "health",
+        "responses": {
+          "204": {
+            "description": "up"
+          }
+        }
+      }
+    },
+    "/items/{id}": {
+      "get": {
+        "operationId": "getItem",
+        "responses": {
+          "2XX": {
+            "description": "the item",
+            "content": {
+              "application/merge-patch+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Item"
+                }
+              }
+            }
+          },
+          "3XX": {
+            "description": "moved"
+          },
+          "5XX": {
+            "description": "failed",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "default": {
+            "description": "anything else",
+            "content": {
+              "application/octet-stream": {}
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patchItem",
+        "requestBody": {
+          "content": {
+            "application/merge-patch+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Item"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Item"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/uploads": {
+      "post": {
+        "operationId": "upload",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {},
+            "multipart/form-data": {}
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "stored",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "putUpload",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/octet-stream": {}
+          }
+        },
+        "parameters": [
+          {
+            "name": "x-size",
+            "in": "header",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "1XX": {
+            "description": "continue"
+          },
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/a/{b}/c/{d}": {
+      "delete": {
+        "operationId": "removeD",
+        "parameters": [
+          {
+            "name": "b",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "accepted",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      }
+    },
+    "/search": {
+      "query": {
+        "operationId": "searchItems",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "q": {
+                    "type": "string"
+                  }
+                },
+                "required": ["q"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "the hits",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Item"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Item": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["id"]
+      },
+      "Client": {
+        "type": "string"
+      }
+    }
+  }
+}

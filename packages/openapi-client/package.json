@@ -1,0 +1,55 @@
+{
+  "name": "openapi-client",
+  "version": "0.0.1",
+  "description": "Hono's RPC client, typed by OpenAPI routes declared with Zod or TypeScript types (createRoute), checked with them when given the routes, and parseResponse",
+  "keywords": [
+    "client",
+    "hono",
+    "openapi",
+    "rpc",
+    "typescript",
+    "zod"
+  ],
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./effect": "./src/effect.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "./effect": {
+        "types": "./dist/effect.d.mts",
+        "default": "./dist/effect.mjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "vp pack"
+  },
+  "devDependencies": {
+    "arktype": "^2.2.9",
+    "effect": "^4.1.2",
+    "valibot": "^1.5.0",
+    "zod": "^4.6.7"
+  },
+  "peerDependencies": {
+    "effect": ">=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "effect": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
